@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kim's 90th Celebration</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { background: #faf7f2; font-family: 'DM Sans', sans-serif; color: #666633; }
+
+    /* ANIMATIONS */
+    @keyframes fadeIn { from { opacity: 0 } to { opacity: 1 } }
+    @keyframes fadeSlideUp { from { opacity: 0; transform: translateY(20px) } to { opacity: 1; transform: translateY(0) } }
+    @keyframes heroSingle {
+      0%   { opacity: 0; transform: scale(1.03); }
+      12%  { opacity: 1; }
+      88%  { opacity: 1; }
+      100% { opacity: 0; transform: scale(1.13); }
+    }
+
+    /* HERO BANNER */
+    .hero { position: relative; width: 100%; height: clamp(320px, 50vh, 520px); overflow: hidden; background: #2c2418; }
+    .hero-single {
+      position: absolute; inset: 0;
+      background-size: cover; background-position: center;
+      animation: heroSingle 16s ease-in-out infinite;
+    }
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 100%);
+      z-index: 1;
+    }
+    .hero-content {
+      position: relative; z-index: 2; height: 100%;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      padding: 0 24px; text-align: center;
+    }
+    .hero-date {
+      font-size: 13px; letter-spacing: 4px; text-transform: uppercase;
+      color: rgba(255,255,255,0.7); margin-bottom: 16px;
+      animation: fadeSlideUp 1s ease 0.2s both;
+    }
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(40px, 8vw, 80px); font-weight: 400;
+      color: #fff; line-height: 1.1; margin-bottom: 16px;
+      animation: fadeSlideUp 1s ease 0.4s both;
+    }
+    .hero-line {
+      width: 60px; height: 1px; background: rgba(255,255,255,0.4);
+      animation: fadeSlideUp 1s ease 0.6s both;
+    }
+
+    /* INTRO */
+    .intro { max-width: 680px; margin: 0 auto; padding: 56px 24px 48px; text-align: center; font-size: 17px; line-height: 1.7; }
+    .intro p { margin-bottom: 16px; }
+    .intro p:last-child { margin-bottom: 0; }
+    .intro-headline {
+      font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 400;
+      color: #605639; margin-bottom: 20px;
+    }
+    .cta-button {
+      display: inline-block; margin-top: 28px; padding: 14px 32px;
+      background: #2c2418; color: #faf7f2; border-radius: 8px;
+      font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 500;
+      text-decoration: none; letter-spacing: 0.5px; transition: background 0.2s;
+    }
+    .cta-button:hover { background: #4a3f32; }
+
+    .divider { width: 60px; height: 1px; background: #c4b49a; margin: 0 auto 48px; }
+
+    /* PHOTO GRID */
+    .grid-section { max-width: 1100px; margin: 0 auto; padding: 0 24px 60px; }
+    .grid-title {
+      font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 400;
+      color: #605639; text-align: center; margin-bottom: 36px;
+    }
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-auto-rows: 1px;
+      column-gap: 20px;
+    }
+
+    .photo-card {
+      cursor: pointer;
+      border-radius: 10px; overflow: hidden; position: relative;
+      background: #e8e0d4; transition: transform 0.25s ease, box-shadow 0.25s ease;
+      box-shadow: 0 2px 8px rgba(44,36,24,0.06);
+    }
+    .photo-card:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(44,36,24,0.15); }
+    .photo-card img {
+      width: 100%; display: block; object-fit: cover;
+      opacity: 0; transition: opacity 0.5s ease;
+    }
+    .photo-card img.loaded { opacity: 1; }
+    .photo-card-info {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 48px 16px 14px;
+      background: linear-gradient(transparent, rgba(0,0,0,0.6));
+      color: #fff;
+    }
+    .photo-card-caption { font-size: 14px; margin-bottom: 4px; letter-spacing: 0.2px; }
+    .photo-card-author { font-size: 12px; opacity: 0.7; }
+    .story-badge {
+      position: absolute; top: 12px; right: 12px;
+      background: rgba(255,255,255,0.9); border-radius: 20px;
+      padding: 5px 10px; display: flex; align-items: center; gap: 5px;
+      backdrop-filter: blur(4px); transition: transform 0.2s ease;
+    }
+    .photo-card:hover .story-badge { transform: scale(1.05); }
+    .story-badge span { font-size: 11px; color: #666633; font-weight: 500; }
+    .photo-number {
+      position: absolute; top: 10px; left: 10px;
+      color: #fff;
+      background: rgba(0,0,0,0.3);
+      padding: 2px 7px; border-radius: 5px;
+      font-family: 'DM Sans', sans-serif; font-size: 11px; font-weight: 500;
+      z-index: 2;
+    }
+
+    .grid-note { text-align: center; font-size: 14px; color: #8b7355; font-style: italic; margin-top: 8px; }
+
+    /* LIGHTBOX */
+    .lightbox {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.82);
+      z-index: 1000; display: none; align-items: center; justify-content: center;
+      padding: 20px; animation: fadeIn 0.25s ease; overflow-y: auto;
+    }
+    .lightbox.open { display: flex; }
+    .lightbox-inner {
+      background: #faf7f2; border-radius: 12px; overflow: hidden;
+      width: 100%; display: flex; flex-wrap: wrap;
+      animation: fadeSlideUp 0.3s ease; position: relative;
+    }
+    .lightbox-inner.has-memory { max-width: 900px; }
+    .lightbox-inner.no-memory { max-width: 700px; }
+    .lightbox-close {
+      position: absolute; top: 12px; right: 12px; z-index: 10;
+      background: rgba(0,0,0,0.4); border: none; border-radius: 50%;
+      width: 36px; height: 36px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-size: 18px; font-family: 'DM Sans', sans-serif;
+    }
+    .lightbox-photo { min-width: 280px; background: #e8e0d4; position: relative; }
+    .lightbox-number {
+      position: absolute; top: 12px; left: 12px;
+      color: #fff;
+      background: rgba(0,0,0,0.3);
+      padding: 2px 8px; border-radius: 5px;
+      font-family: 'DM Sans', sans-serif; font-size: 12px; font-weight: 500;
+      z-index: 2;
+    }
+    .lightbox-photo.with-memory { flex: 1 1 50%; max-height: 90vh; }
+    .lightbox-photo.without-memory { flex: 1 1 100%; max-height: 80vh; }
+    .lightbox-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .lightbox-memory {
+      flex: 1 1 40%; min-width: 260px; padding: 36px 32px;
+      overflow-y: auto; max-height: 90vh;
+    }
+    .lightbox-memory-label { font-size: 12px; letter-spacing: 2px; text-transform: uppercase; color: #8b7355; margin-bottom: 8px; }
+    .lightbox-memory-author { font-family: 'Playfair Display', serif; font-size: 26px; font-weight: 400; color: #605639; margin-bottom: 8px; }
+    .lightbox-memory-caption { font-size: 14px; color: #8b7355; font-style: italic; margin-bottom: 24px; }
+    .lightbox-memory-line { width: 40px; height: 1px; background: #c4b49a; margin-bottom: 24px; }
+    .lightbox-memory-text { font-size: 15px; line-height: 1.75; color: #666633; white-space: pre-wrap; }
+    .lightbox-simple-caption { width: 100%; padding: 16px 24px 20px; text-align: center; }
+    .lightbox-simple-caption p { font-size: 15px; color: #666633; margin-bottom: 4px; }
+    .lightbox-simple-caption .author { font-size: 13px; color: #8b7355; margin: 0; }
+
+    /* FORM */
+    .form-section { background: #f0ebe1; padding: 60px 24px; }
+    .form-wrap { max-width: 560px; margin: 0 auto; text-align: center; }
+    .form-title { font-family: 'Playfair Display', serif; font-size: 28px; font-weight: 400; color: #605639; margin-bottom: 12px; }
+    .form-subtitle { font-size: 15px; color: #6b5d4d; margin-bottom: 32px; }
+    .form-fields { text-align: left; }
+    .form-group { margin-bottom: 20px; }
+    .form-label { font-size: 13px; color: #6b5d4d; display: block; margin-bottom: 6px; letter-spacing: 0.5px; }
+    .form-hint { font-size: 12px; color: #8b7355; margin-top: 8px; font-style: italic; line-height: 1.5; }
+    .form-input, .form-textarea {
+      width: 100%; padding: 12px 14px; border: 1px solid #d4c9b8;
+      border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 15px;
+      background: #faf7f2; color: #666633;
+    }
+    .form-input:focus, .form-textarea:focus { outline: none; border-color: #8b7355; }
+    .form-textarea { resize: vertical; }
+    .form-button {
+      width: 100%; padding: 14px 24px; background: #2c2418; color: #faf7f2;
+      border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif;
+      font-size: 15px; font-weight: 500; cursor: pointer; letter-spacing: 0.5px;
+      transition: background 0.2s;
+    }
+    .form-button:hover { background: #4a3f32; }
+    .email-alt {
+      margin-top: 24px; font-size: 14px; color: #8b7355;
+    }
+    .email-alt a { color: #605639; text-decoration: underline; text-underline-offset: 3px; transition: color 0.2s; }
+    .email-alt a:hover { color: #2c2418; }
+
+    /* EVENT DETAILS */
+    .event-details {
+      margin: 28px 0; padding: 24px 0; border-top: 1px solid #c4b49a; border-bottom: 1px solid #c4b49a;
+    }
+    .event-details p { margin-bottom: 2px; font-size: 16px; color: #2c2418; line-height: 1.3; }
+    .event-details p:last-child { margin-bottom: 0; }
+    .event-details .event-date { font-family: 'Playfair Display', serif; font-size: 20px; font-weight: 400; margin-bottom: 8px; line-height: 1.2; }
+    .event-details a { color: #8b7355; text-decoration: underline; text-underline-offset: 3px; transition: color 0.2s; }
+    .event-details a:hover { color: #2c2418; }
+    .event-details .event-invite { margin-top: 16px; font-size: 17px; color: #666633; line-height: 1.6; }
+
+    /* FOOTER */
+    footer { text-align: center; padding: 40px 24px; font-size: 13px; color: #8b7355; }
+
+    /* BACK TO TOP */
+    .back-to-top {
+      position: fixed; bottom: 28px; right: 28px; z-index: 900;
+      width: 44px; height: 44px; border-radius: 50%;
+      background: #2c2418; border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 4px 16px rgba(44,36,24,0.25);
+      opacity: 0; transform: translateY(12px);
+      transition: opacity 0.3s ease, transform 0.3s ease, background 0.2s;
+      pointer-events: none;
+    }
+    .back-to-top.visible { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .back-to-top:hover { background: #4a3f32; }
+    .back-to-top svg { width: 20px; height: 20px; }
+
+    /* ========================================
+       TABLET — 768px and below
+       ======================================== */
+    @media (max-width: 768px) {
+      .photo-grid { grid-template-columns: repeat(2, 1fr); column-gap: 16px; }
+      .grid-section { padding: 0 16px 48px; }
+      .grid-title { font-size: 24px; margin-bottom: 28px; }
+      .intro { padding: 44px 20px 40px; font-size: 16px; }
+      .intro-headline { font-size: 24px; }
+      .form-section { padding: 48px 20px; }
+      .lightbox-memory { padding: 28px 24px; }
+      .lightbox-memory-author { font-size: 22px; }
+    }
+
+    /* ========================================
+       MOBILE — 600px and below
+       ======================================== */
+    @media (max-width: 600px) {
+
+      /* Hero — shorter so intro peeks in */
+      .hero { height: clamp(240px, 35vh, 340px); }
+      .hero-date { font-size: 11px; letter-spacing: 3px; margin-bottom: 12px; }
+      .hero-title { font-size: clamp(28px, 8vw, 40px); }
+
+      /* Intro copy */
+      .intro { padding: 36px 16px 32px; font-size: 15px; line-height: 1.65; }
+      .intro-headline { font-size: 22px; margin-bottom: 16px; }
+      .cta-button { margin-top: 20px; padding: 14px 28px; font-size: 14px; width: 100%; text-align: center; }
+
+      /* Event details */
+      .event-details { margin: 20px 0; padding: 20px 0; }
+      .event-details .event-date { font-size: 18px; margin-bottom: 6px; }
+      .event-details p { font-size: 14px; }
+
+      .divider { margin: 0 auto 32px; }
+
+      /* Photo grid — single column, edge to edge */
+      .photo-grid { grid-template-columns: 1fr; }
+      .grid-section { padding: 0 12px 40px; }
+      .grid-title { font-size: 22px; margin-bottom: 24px; }
+      .photo-card { border-radius: 8px; }
+      .photo-card-info { padding: 40px 14px 12px; }
+      .photo-card-caption { font-size: 13px; }
+      .photo-card-author { font-size: 11px; }
+      .story-badge { padding: 6px 12px; }
+      .story-badge span { font-size: 12px; }
+      .grid-note { font-size: 13px; }
+
+      /* Lightbox — full screen takeover */
+      .lightbox { padding: 0; align-items: flex-start; }
+      .lightbox-inner { border-radius: 0; max-width: 100%; max-height: 100vh; overflow-y: auto; }
+      .lightbox-inner.has-memory { max-width: 100%; }
+      .lightbox-inner.no-memory { max-width: 100%; }
+      .lightbox-close {
+        position: fixed; top: 12px; right: 12px;
+        width: 44px; height: 44px; font-size: 20px;
+      }
+      .lightbox-photo { min-width: 100%; }
+      .lightbox-photo.with-memory { flex: 1 1 100%; max-height: 50vh; }
+      .lightbox-photo.without-memory { flex: 1 1 100%; max-height: 70vh; }
+      .lightbox-photo img { max-height: 50vh; object-fit: cover; }
+      .lightbox-memory {
+        flex: 1 1 100%; min-width: 100%;
+        padding: 24px 20px 40px;
+        max-height: none; overflow-y: visible;
+      }
+      .lightbox-memory-author { font-size: 22px; }
+      .lightbox-memory-caption { margin-bottom: 16px; }
+      .lightbox-memory-line { margin-bottom: 16px; }
+      .lightbox-memory-text { font-size: 14px; line-height: 1.7; }
+      .lightbox-simple-caption { padding: 14px 16px 18px; }
+
+      /* Form */
+      .form-section { padding: 40px 16px; }
+      .form-title { font-size: 22px; }
+      .form-subtitle { font-size: 14px; margin-bottom: 24px; }
+      .form-input, .form-textarea { padding: 14px 14px; font-size: 16px; }
+      .form-button { padding: 16px 24px; font-size: 16px; }
+      .email-alt { font-size: 13px; }
+
+      /* Footer */
+      footer { padding: 32px 16px; font-size: 12px; }
+
+      /* Back to top — nudge in slightly */
+      .back-to-top { bottom: 20px; right: 20px; }
+    }
+
+    /* ========================================
+       SMALL MOBILE — 380px and below
+       ======================================== */
+    @media (max-width: 380px) {
+      .hero { height: clamp(200px, 32vh, 280px); }
+      .hero-title { font-size: 26px; }
+      .intro { padding: 28px 14px 24px; font-size: 14px; }
+      .intro-headline { font-size: 19px; }
+      .event-details .event-date { font-size: 16px; }
+      .event-details p { font-size: 13px; }
+      .grid-section { padding: 0 10px 32px; }
+      .form-section { padding: 32px 14px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HERO BANNER -->
+  <div class="hero">
+    <div class="hero-single" style="background-image: url('images/02_banner.webp')"></div>
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+      <p class="hero-date">Sunday 13 September 2026</p>
+      <h1 class="hero-title">Kim's 90th Celebration</h1>
+      <div class="hero-line"></div>
+    </div>
+  </div>
+
+  <!-- INTRO -->
+  <section class="intro">
+    <p class="intro-headline">Come celebrate with us a wonderful life story.</p>
+    <p>From the Falkland's to New Zealand, Kim journeyed with his family, settled in West Auckland and built a new life here. Spanning 90 remarkable years, here's a small look back of Kim and some of us who shared in his journey.</p>
+
+    <div class="event-details">
+      <p class="event-date">Join us on Sunday 13 September 2026 from 11:00–14:00 AEST</p>
+      <p><a href="https://www.rymanhealthcare.co.nz/retirement-villages/auckland/keith-park#villagemap" target="_blank">Keith Park Retirement Village</a></p>
+      <p><a href="https://www.rymanhealthcare.co.nz/retirement-villages/auckland/keith-park#villagemap" target="_blank">3 Scott Road, Hobsonville, Auckland 0616</a></p>
+      <p class="event-invite">So come along, have a drink, a little sweet treat and let's make a great afternoon of it and make a few more great memories.<br>You can also find the latest updates at <a href="https://www.facebook.com/events/2842081206176448/" target="_blank">our Facebook event page</a>.</p>
+    </div>
+
+    <p>This will be the home for some of the finest memories of Kim's life and chances are you'll find yourself in a few of them. Got your own photos or stories with Kim? We'd love you to share them with us. Upload your pics, with a note on why this is a special memory for you and we'll add them to the growing collection.</p>
+
+    <a href="#share-memory" class="cta-button">Add to the collection</a>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PHOTO GRID -->
+  <section class="grid-section">
+    <h2 class="grid-title">The collection so far</h2>
+    <div class="photo-grid" id="photo-grid"></div>
+  </section>
+
+  <!-- SHARE -->
+  <section class="form-section" id="share-memory">
+    <div class="form-wrap">
+      <h2 class="form-title">Add to the collection</h2>
+      <p class="form-subtitle">Got something you'd love to add? Maybe a comment on a photo that's already here, or a new one of your own to share.</p>
+
+      <div class="form-fields">
+        <div class="form-group">
+          <label class="form-label">Your name</label>
+          <input class="form-input" type="text" id="input-name">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Your comment or memory</label>
+          <textarea class="form-textarea" id="input-message" rows="5"></textarea>
+          <p class="form-hint">Adding a comment to a photo that's already here? Just pop in its number so we know the one you mean.</p>
+        </div>
+        <button class="form-button" onclick="submitForm()">Click here to open your email and send it</button>
+      </div>
+
+      <p class="email-alt">This will open your email app with your note filled in. Add a photo if you have one, then hit send. It goes to <a href="mailto:kims90th@gmail.com?subject=A memory of Kim">kims90th@gmail.com</a></p>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>Made with love for Kim Osborne's 90th</footer>
+
+  <!-- BACK TO TOP -->
+  <button class="back-to-top" id="back-to-top" aria-label="Back to top">
+    <svg viewBox="0 0 24 24" fill="none" stroke="#faf7f2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M18 15l-6-6-6 6"/>
+    </svg>
+  </button>
+
+  <!-- LIGHTBOX -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox()">
+    <div class="lightbox-inner" id="lightbox-inner" onclick="event.stopPropagation()">
+      <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+      <div class="lightbox-photo" id="lightbox-photo">
+        <span class="lightbox-number" id="lightbox-number"></span>
+        <img id="lightbox-img" src="" alt="">
+      </div>
+      <div class="lightbox-memory" id="lightbox-memory">
+        <p class="lightbox-memory-label">A memory from</p>
+        <h3 class="lightbox-memory-author" id="lightbox-author"></h3>
+        <p class="lightbox-memory-caption" id="lightbox-caption-memory"></p>
+        <div class="lightbox-memory-line"></div>
+        <p class="lightbox-memory-text" id="lightbox-text"></p>
+      </div>
+      <div class="lightbox-simple-caption" id="lightbox-simple">
+        <p id="lightbox-caption-simple"></p>
+        <p class="author" id="lightbox-author-simple"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // PHOTO DATA
+    var photos = [
+      { label:"1", src:"images/01_thumb.webp", full:"images/01_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"2", src:"images/02_thumb.webp", full:"images/02_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"3", src:"images/03_thumb.webp", full:"images/03_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"4", src:"images/04_thumb.webp", full:"images/04_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"5", src:"images/05_thumb.webp", full:"images/05_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"6", src:"images/06_thumb.webp", full:"images/06_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"7", src:"images/07_thumb.webp", full:"images/07_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"8", src:"images/08_thumb.webp", full:"images/08_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"8a", src:"images/08a_thumb.webp", full:"images/08a_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"8b", src:"images/08b_thumb.webp", full:"images/08b_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"9", src:"images/09_thumb.webp", full:"images/09_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"10", src:"images/10_thumb.webp", full:"images/10_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"11", src:"images/11_thumb.webp", full:"images/11_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"12", src:"images/12_thumb.webp", full:"images/12_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"13", src:"images/13_thumb.webp", full:"images/13_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"14", src:"images/14_thumb.webp", full:"images/14_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"15", src:"images/15_thumb.webp", full:"images/15_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"15a", src:"images/15a_thumb.webp", full:"images/15a_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"16", src:"images/16_thumb.webp", full:"images/16_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"17", src:"images/17_thumb.webp", full:"images/17_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"18", src:"images/18_thumb.webp", full:"images/18_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"19", src:"images/19_thumb.webp", full:"images/19_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"20", src:"images/20_thumb.webp", full:"images/20_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"20a", src:"images/20a_thumb.webp", full:"images/20a_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"21", src:"images/21_thumb.webp", full:"images/21_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"21a", src:"images/21a_thumb.webp", full:"images/21a_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"22", src:"images/22_thumb.webp", full:"images/22_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"23", src:"images/23_thumb.webp", full:"images/23_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"24", src:"images/24_thumb.webp", full:"images/24_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"25", src:"images/25_thumb.webp", full:"images/25_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"26", src:"images/26_thumb.webp", full:"images/26_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"27", src:"images/27_thumb.webp", full:"images/27_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"28", src:"images/28_thumb.webp", full:"images/28_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"29", src:"images/29_thumb.webp", full:"images/29_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"30", src:"images/30_thumb.webp", full:"images/30_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"31", src:"images/31_thumb.webp", full:"images/31_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"32", src:"images/32_thumb.webp", full:"images/32_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"32a", src:"images/32a_thumb.webp", full:"images/32a_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"33", src:"images/33_thumb.webp", full:"images/33_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"34", src:"images/34_thumb.webp", full:"images/34_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"34a", src:"images/34a_thumb.webp", full:"images/34a_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"35", src:"images/35_thumb.webp", full:"images/35_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"36", src:"images/36_thumb.webp", full:"images/36_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"37", src:"images/37_thumb.webp", full:"images/37_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"38", src:"images/38_thumb.webp", full:"images/38_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"39", src:"images/39_thumb.webp", full:"images/39_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"40", src:"images/40_thumb.webp", full:"images/40_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"41", src:"images/41_thumb.webp", full:"images/41_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"41a", src:"images/41a_thumb.webp", full:"images/41a_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"42", src:"images/42_thumb.webp", full:"images/42_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"43", src:"images/43_thumb.webp", full:"images/43_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"44", src:"images/44_thumb.webp", full:"images/44_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"45", src:"images/45_thumb.webp", full:"images/45_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"46", src:"images/46_thumb.webp", full:"images/46_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"47", src:"images/47_thumb.webp", full:"images/47_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"48", src:"images/48_thumb.webp", full:"images/48_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"49", src:"images/49_thumb.webp", full:"images/49_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"50", src:"images/50_thumb.webp", full:"images/50_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"51", src:"images/51_thumb.webp", full:"images/51_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"52", src:"images/52_thumb.webp", full:"images/52_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"53", src:"images/53_thumb.webp", full:"images/53_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"54", src:"images/54_thumb.webp", full:"images/54_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"55", src:"images/55_thumb.webp", full:"images/55_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"55a", src:"images/55a_thumb.webp", full:"images/55a_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"56", src:"images/56_thumb.webp", full:"images/56_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"57", src:"images/57_thumb.webp", full:"images/57_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"58", src:"images/58_thumb.webp", full:"images/58_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"59", src:"images/59_thumb.webp", full:"images/59_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"60", src:"images/60_thumb.webp", full:"images/60_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"61", src:"images/61_thumb.webp", full:"images/61_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"62", src:"images/62_thumb.webp", full:"images/62_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"63", src:"images/63_thumb.webp", full:"images/63_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"64", src:"images/64_thumb.webp", full:"images/64_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"65", src:"images/65_thumb.webp", full:"images/65_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"66", src:"images/66_thumb.webp", full:"images/66_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"67", src:"images/67_thumb.webp", full:"images/67_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"68", src:"images/68_thumb.webp", full:"images/68_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"69", src:"images/69_thumb.webp", full:"images/69_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"70", src:"images/70_thumb.webp", full:"images/70_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"71", src:"images/71_thumb.webp", full:"images/71_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"72", src:"images/72_thumb.webp", full:"images/72_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"73", src:"images/73_thumb.webp", full:"images/73_full.webp", caption:"", author:"", tall:false, memory:null },
+      { label:"74", src:"images/74_thumb.webp", full:"images/74_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"75", src:"images/75_thumb.webp", full:"images/75_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"76", src:"images/76_thumb.webp", full:"images/76_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"77", src:"images/77_thumb.webp", full:"images/77_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"78", src:"images/78_thumb.webp", full:"images/78_full.webp", caption:"", author:"", tall:true, memory:null },
+      { label:"79", src:"images/79_thumb.webp", full:"images/79_full.webp", caption:"", author:"", tall:true, memory:null },
+    ];
+
+    // PHOTO GRID
+    var grid = document.getElementById('photo-grid');
+
+    function gridGap() {
+      if (window.innerWidth <= 600) return 12;
+      if (window.innerWidth <= 768) return 16;
+      return 20;
+    }
+
+    function setSpan(card) {
+      var img = card.querySelector('img');
+      var h = img ? img.getBoundingClientRect().height : 0;
+      if (h > 0) card.style.gridRowEnd = 'span ' + Math.ceil(h + gridGap());
+    }
+
+    function recalcAllSpans() {
+      var cards = document.querySelectorAll('.photo-card');
+      for (var i = 0; i < cards.length; i++) setSpan(cards[i]);
+    }
+
+    photos.forEach(function(photo, index) {
+      var card = document.createElement('div');
+      card.className = 'photo-card';
+      card.onclick = (function(p, i) { return function() { openLightbox(p, p.label || (i + 1)); }; })(photo, index);
+
+      var num = document.createElement('div');
+      num.className = 'photo-number';
+      num.textContent = photo.label || (index + 1);
+      card.appendChild(num);
+
+      var img = document.createElement('img');
+      img.src = photo.src;
+      img.alt = photo.caption || ('Photo ' + (photo.label || (index + 1)));
+      img.loading = 'lazy';
+      img.style.aspectRatio = photo.tall ? '3/4' : '4/3';
+      img.onload = function() { this.classList.add('loaded'); setSpan(card); };
+      card.appendChild(img);
+
+      if (photo.caption || photo.author) {
+        var info = document.createElement('div');
+        info.className = 'photo-card-info';
+        var captionLine = photo.caption ? '<p class="photo-card-caption">' + photo.caption + '</p>' : '';
+        var authorLine = photo.author ? '<p class="photo-card-author">shared by ' + photo.author + '</p>' : '';
+        info.innerHTML = captionLine + authorLine;
+        card.appendChild(info);
+      }
+
+      if (photo.memory) {
+        var badge = document.createElement('div');
+        badge.className = 'story-badge';
+        badge.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#666633" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Story</span>';
+        card.appendChild(badge);
+      }
+
+      grid.appendChild(card);
+      setSpan(card);
+    });
+
+    // Recalculate spans once layout settles and on resize
+    requestAnimationFrame(recalcAllSpans);
+    window.addEventListener('load', recalcAllSpans);
+    var resizeTimer;
+    window.addEventListener('resize', function() {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(recalcAllSpans, 150);
+    });
+
+    // LIGHTBOX
+    function openLightbox(photo, num) {
+      var lightbox = document.getElementById('lightbox');
+      var inner = document.getElementById('lightbox-inner');
+      var photoDiv = document.getElementById('lightbox-photo');
+      var memoryDiv = document.getElementById('lightbox-memory');
+      var simpleDiv = document.getElementById('lightbox-simple');
+
+      document.getElementById('lightbox-img').src = photo.full || photo.src;
+      document.getElementById('lightbox-img').alt = photo.caption;
+      document.getElementById('lightbox-number').textContent = num;
+
+      if (photo.memory) {
+        inner.className = 'lightbox-inner has-memory';
+        photoDiv.className = 'lightbox-photo with-memory';
+        memoryDiv.style.display = 'block';
+        simpleDiv.style.display = 'none';
+        document.getElementById('lightbox-author').textContent = photo.author;
+        document.getElementById('lightbox-caption-memory').textContent = photo.caption;
+        document.getElementById('lightbox-text').textContent = photo.memory;
+      } else {
+        inner.className = 'lightbox-inner no-memory';
+        photoDiv.className = 'lightbox-photo without-memory';
+        memoryDiv.style.display = 'none';
+        document.getElementById('lightbox-caption-simple').textContent = photo.caption || '';
+        document.getElementById('lightbox-author-simple').textContent = photo.author ? 'shared by ' + photo.author : '';
+        simpleDiv.style.display = (photo.caption || photo.author) ? 'block' : 'none';
+      }
+
+      lightbox.classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') closeLightbox();
+    });
+
+    // FORM
+    function submitForm() {
+      var name = document.getElementById('input-name').value.trim();
+      var message = document.getElementById('input-message').value.trim();
+      if (!name) {
+        document.getElementById('input-name').style.borderColor = '#c0785a';
+        return;
+      }
+
+      var subject = 'For Kim\'s 90th, from ' + name;
+      var body = 'Name: ' + name + '\n\n';
+      if (message) {
+        body += 'Comment / memory:\n' + message + '\n\n';
+      }
+      body += '(If you\'re adding a new photo, attach it to this email before sending.)';
+
+      var mailto = 'mailto:kims90th@gmail.com'
+        + '?subject=' + encodeURIComponent(subject)
+        + '&body=' + encodeURIComponent(body);
+
+      window.location.href = mailto;
+    }
+
+    // BACK TO TOP
+    var backBtn = document.getElementById('back-to-top');
+    window.addEventListener('scroll', function() {
+      if (window.scrollY > 500) {
+        backBtn.classList.add('visible');
+      } else {
+        backBtn.classList.remove('visible');
+      }
+    });
+    backBtn.onclick = function() {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+  </script>
+
+</body>
+</html>
